@@ -1,0 +1,17 @@
+[
+  {
+    "name": "incomplete_case",
+    "situation": "先有产品后补批次",
+    "observable": "同案补全，信息不足不冒充可执行"
+  },
+  {
+    "name": "recipient_history",
+    "situation": "旧收件人与当前库存交错变化",
+    "observable": "更正范围可追查且不重复"
+  },
+  {
+    "name": "withdrawn_batch",
+    "situation": "已撤批次的旧公告回流",
+    "observable": "不恢复旧范围"
+  }
+]

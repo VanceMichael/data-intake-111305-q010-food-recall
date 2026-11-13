@@ -1,0 +1,160 @@
+{
+  "identity_fields": [
+    "authority",
+    "case",
+    "revision"
+  ],
+  "source_records": [
+    {
+      "authority": "district-a",
+      "case": "RC-8",
+      "revision": 1,
+      "product": "合成谷物棒",
+      "lots": null,
+      "status": "published"
+    },
+    {
+      "authority": "district-a",
+      "case": "RC-8",
+      "revision": 2,
+      "product": "合成谷物棒",
+      "lots": [
+        "L10",
+        "L11"
+      ],
+      "status": "published"
+    },
+    {
+      "authority": "district-a",
+      "case": "RC-8",
+      "revision": 3,
+      "product": "合成谷物棒",
+      "lots": [
+        "L10"
+      ],
+      "withdrawn_lots": [
+        "L11"
+      ],
+      "status": "corrected"
+    },
+    {
+      "authority": "district-b",
+      "case": "RC-8",
+      "revision": 1,
+      "product": "合成谷物棒",
+      "lots": [
+        "L20"
+      ],
+      "status": "published"
+    }
+  ],
+  "portal": {
+    "csrf": "form-2026-b"
+  },
+  "routes": {
+    "/feed": {
+      "body": "<!doctype html><html lang='zh'><meta charset='utf-8'><title>来源目录</title><body>\n<article><h2>合成谷物棒</h2>\n<dl><dt>authority</dt><dd>district-a</dd><dt>case</dt><dd>RC-8</dd><dt>revision</dt><dd>1</dd><dt>product</dt><dd>合成谷物棒</dd><dt>lots</dt><dd>None</dd><dt>status</dt><dd>published</dd></dl>\n</article>\n<article><h2>合成谷物棒</h2>\n<dl><dt>authority</dt><dd>district-a</dd><dt>case</dt><dd>RC-8</dd><dt>revision</dt><dd>2</dd><dt>product</dt><dd>合成谷物棒</dd><dt>lots</dt><dd>[&#x27;L10&#x27;, &#x27;L11&#x27;]</dd><dt>status</dt><dd>published</dd></dl>\n</article>\n<article><h2>合成谷物棒</h2>\n<dl><dt>authority</dt><dd>district-a</dd><dt>case</dt><dd>RC-8</dd><dt>revision</dt><dd>3</dd><dt>product</dt><dd>合成谷物棒</dd><dt>lots</dt><dd>[&#x27;L10&#x27;]</dd><dt>withdrawn_lots</dt><dd>[&#x27;L11&#x27;]</dd><dt>status</dt><dd>corrected</dd></dl>\n</article>\n<article><h2>合成谷物棒</h2>\n<dl><dt>authority</dt><dd>district-b</dd><dt>case</dt><dd>RC-8</dd><dt>revision</dt><dd>1</dd><dt>product</dt><dd>合成谷物棒</dd><dt>lots</dt><dd>[&#x27;L20&#x27;]</dd><dt>status</dt><dd>published</dd></dl>\n</article>\n<script type=\"application/json\" id=\"source-records\">[{\"authority\": \"district-a\", \"case\": \"RC-8\", \"revision\": 1, \"product\": \"合成谷物棒\", \"lots\": null, \"status\": \"published\"}, {\"authority\": \"district-a\", \"case\": \"RC-8\", \"revision\": 2, \"product\": \"合成谷物棒\", \"lots\": [\"L10\", \"L11\"], \"status\": \"published\"}, {\"authority\": \"district-a\", \"case\": \"RC-8\", \"revision\": 3, \"product\": \"合成谷物棒\", \"lots\": [\"L10\"], \"withdrawn_lots\": [\"L11\"], \"status\": \"corrected\"}, {\"authority\": \"district-b\", \"case\": \"RC-8\", \"revision\": 1, \"product\": \"合成谷物棒\", \"lots\": [\"L20\"], \"status\": \"published\"}]</script></body></html>",
+      "content_type": "text/html; charset=utf-8",
+      "headers": {
+        "ETag": "feed-1"
+      }
+    },
+    "/rate-limited": {
+      "status": 429,
+      "headers": {
+        "Retry-After": "2"
+      },
+      "json": {
+        "error": "quota"
+      }
+    },
+    "/unstable": [
+      {
+        "status": 503,
+        "body": "temporarily unavailable"
+      },
+      {
+        "json": {
+          "items": []
+        }
+      }
+    ],
+    "/range": {
+      "body": "0123456789",
+      "range": true
+    },
+    "/range-ignored": {
+      "body": "0123456789"
+    },
+    "/truncated": {
+      "body": "partial",
+      "truncate": true
+    },
+    "/observations/1": {
+      "json": {
+        "items": [
+          {
+            "authority": "district-a",
+            "case": "RC-8",
+            "revision": 1,
+            "product": "合成谷物棒",
+            "lots": null,
+            "status": "published"
+          }
+        ]
+      }
+    },
+    "/observations/2": {
+      "json": {
+        "items": [
+          {
+            "authority": "district-a",
+            "case": "RC-8",
+            "revision": 2,
+            "product": "合成谷物棒",
+            "lots": [
+              "L10",
+              "L11"
+            ],
+            "status": "published"
+          }
+        ]
+      }
+    },
+    "/observations/3": {
+      "json": {
+        "items": [
+          {
+            "authority": "district-a",
+            "case": "RC-8",
+            "revision": 3,
+            "product": "合成谷物棒",
+            "lots": [
+              "L10"
+            ],
+            "withdrawn_lots": [
+              "L11"
+            ],
+            "status": "corrected"
+          }
+        ]
+      }
+    },
+    "/observations/4": {
+      "json": {
+        "items": [
+          {
+            "authority": "district-b",
+            "case": "RC-8",
+            "revision": 1,
+            "product": "合成谷物棒",
+            "lots": [
+              "L20"
+            ],
+            "status": "published"
+          }
+        ]
+      }
+    }
+  }
+}
