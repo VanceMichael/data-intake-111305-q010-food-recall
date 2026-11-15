@@ -23,3 +23,17 @@
 - `name`：situation；业务侧关注observable。
 
 另外提供 `/rate-limited`、`/unstable`、`/range`、`/range-ignored`、`/truncated`、`/observations/1`、`/observations/2`、`/observations/3`、`/observations/4`。响应内容和版本由场景文件逐项声明，便于核对实际收到的来源资料。
+
+## 公告字段
+
+来源记录的身份字段是 `authority`、`case`、`revision`。业务层据此解释公告，但不会把来源声明当作已解决的身份：
+
+- `authority` 与 `case` 一起构成案件身份；不同 `authority` 下相同 `case` 是两个案件。
+- `revision` 只用于排序修订，必须是非负整数。没有修订号的观察无法自动推进案件。
+- `product` 是产品名。缺少产品名的观察需要人工核对。
+- `lots` 是本次公告列出的批次；`null` 或空数组表示批次待补。字符串形式也接受，逗号、顿号、分号与换行都作为分隔符。
+- `withdrawn_lots` 是明确撤回的批次，累积生效。
+- `status` 缺省为 `published`。`corrected`、`amended`、`revised` 表示来源收窄范围：以前有效但本版未列出的批次视为撤回；`withdrawn`、`cancelled`、`canceled`、`retracted`、`closed`、`revoked` 表示整个案件撤回。
+
+字段给出但格式错误（例如 `revision` 为字符串、`lots` 是对象）视为坏记录：接收会报告该条的下标与错误，但不写入案件。缺少字段本身不是坏记录，而是业务状态（待补或待核）。
+
