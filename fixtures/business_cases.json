@@ -1,17 +1,157 @@
 [
   {
-    "name": "name",
-    "situation": "situation",
-    "observable": "observable"
+    "name": "批次补齐与撤回的追补",
+    "situation": "district-a 的 RC-8 首版只有产品名，门店先按产品名排查；随后补齐批次 L10/L11，再更正撤掉 L11；district-b 的同编号 RC-8 是另一个案件。S1 持 L10、S2 持 L11、S3 无相关库存，三者订阅 district-a；S4 订阅 district-b 并持 L20；S5 与 S6 在首版之后才订阅 district-a，S5 后来补进 L10，S6 始终无相关库存。",
+    "observable": "待补案件补齐后仍是同一案件；补发与更正只覆盖见过旧内容或当前受影响的门店，S6 从未收到通知；同编号跨地区各自成案；旧页重现不恢复已撤的 L11。",
+    "stores": [
+      {"id": "S1", "authorities": ["district-a"], "lots": ["L10"]},
+      {"id": "S2", "authorities": ["district-a"], "lots": ["L11"]},
+      {"id": "S3", "authorities": ["district-a"], "lots": []},
+      {"id": "S4", "authorities": ["district-b"], "lots": ["L20"]}
+    ],
+    "steps": [
+      {
+        "ingest": {"authority": "district-a", "case": "RC-8", "revision": 1, "product": "合成谷物棒", "lots": null, "status": "published"},
+        "expect": {
+          "event": "opened",
+          "case": {"state": "pending_lots", "effective_lots": []},
+          "notifications": {"S1": "initial", "S2": "initial", "S3": "initial"}
+        }
+      },
+      {
+        "ingest": {"authority": "district-a", "case": "RC-8", "revision": 2, "product": "合成谷物棒", "lots": ["L10", "L11"], "status": "published"},
+        "expect": {
+          "event": "lots_supplied",
+          "case": {"state": "executable", "effective_lots": ["L10", "L11"]},
+          "notifications": {
+            "S1": {"kind": "supplement", "reason": "affected+previously_notified"},
+            "S2": {"kind": "supplement", "reason": "affected+previously_notified"},
+            "S3": {"kind": "supplement", "reason": "previously_notified"}
+          }
+        }
+      },
+      {"subscribe": {"store": "S5", "authorities": ["district-a"], "lots": []}},
+      {"subscribe": {"store": "S6", "authorities": ["district-a"], "lots": []}},
+      {
+        "ingest": {"authority": "district-b", "case": "RC-8", "revision": 1, "product": "合成谷物棒", "lots": ["L20"], "status": "published"},
+        "expect": {
+          "event": "opened",
+          "case": {"state": "executable", "effective_lots": ["L20"]},
+          "notifications": {"S4": "initial"}
+        }
+      },
+      {"set_inventory": {"store": "S5", "lots": ["L10"]}},
+      {
+        "ingest": {"authority": "district-a", "case": "RC-8", "revision": 3, "product": "合成谷物棒", "lots": ["L10"], "withdrawn_lots": ["L11"], "status": "corrected"},
+        "expect": {
+          "event": "corrected",
+          "case": {"state": "executable", "effective_lots": ["L10"], "withdrawn_lots": ["L11"]},
+          "notifications": {
+            "S1": {"kind": "correction", "reason": "affected+previously_notified"},
+            "S2": {"kind": "correction", "reason": "previously_notified"},
+            "S3": {"kind": "correction", "reason": "previously_notified"},
+            "S5": {"kind": "correction", "reason": "affected"}
+          }
+        }
+      },
+      {
+        "ingest": {"authority": "district-a", "case": "RC-8", "revision": 2, "product": "合成谷物棒", "lots": ["L10", "L11"], "status": "published"},
+        "capture_id": 90,
+        "expect": {
+          "event": "stale",
+          "case": {"state": "executable", "effective_lots": ["L10"], "withdrawn_lots": ["L11"]},
+          "notifications": {}
+        }
+      }
+    ],
+    "final": {
+      "cases": 2,
+      "review_open": 0,
+      "notification_counts": {"S1": 3, "S2": 3, "S3": 3, "S4": 1, "S5": 1, "S6": 0},
+      "store_scope": {
+        "S1": [{"authority": "district-a", "case": "RC-8", "inventory_hits": ["L10"], "withdrawn_hits": [], "notified": true}],
+        "S2": [{"authority": "district-a", "case": "RC-8", "inventory_hits": [], "withdrawn_hits": ["L11"], "notified": true}],
+        "S3": [{"authority": "district-a", "case": "RC-8", "inventory_hits": [], "withdrawn_hits": [], "notified": true}],
+        "S4": [{"authority": "district-b", "case": "RC-8", "inventory_hits": ["L20"], "withdrawn_hits": [], "notified": true}],
+        "S5": [{"authority": "district-a", "case": "RC-8", "inventory_hits": ["L10"], "withdrawn_hits": [], "notified": true}],
+        "S6": [{"authority": "district-a", "case": "RC-8", "inventory_hits": [], "withdrawn_hits": [], "notified": false}]
+      }
+    }
   },
   {
-    "name": "name",
-    "situation": "situation",
-    "observable": "observable"
+    "name": "同编号跨地区与同名产品不合案",
+    "situation": "district-a 与 district-b 出现同编号 RC-9，产品名相同；district-a 另有 RC-10 也是同一产品名。S1 订阅 district-a 持 L30，S2 订阅 district-b 持 L40。",
+    "observable": "三个来源身份各自成案，自动处理不因产品名相同而合并；通知圈互不相通，库存不匹配时不发首版。",
+    "stores": [
+      {"id": "S1", "authorities": ["district-a"], "lots": ["L30"]},
+      {"id": "S2", "authorities": ["district-b"], "lots": ["L40"]}
+    ],
+    "steps": [
+      {
+        "ingest": {"authority": "district-a", "case": "RC-9", "revision": 1, "product": "合成谷物棒", "lots": ["L30"], "status": "published"},
+        "expect": {
+          "event": "opened",
+          "case": {"state": "executable", "effective_lots": ["L30"]},
+          "notifications": {"S1": "initial"}
+        }
+      },
+      {
+        "ingest": {"authority": "district-b", "case": "RC-9", "revision": 1, "product": "合成谷物棒", "lots": ["L40"], "status": "published"},
+        "expect": {
+          "event": "opened",
+          "case": {"state": "executable", "effective_lots": ["L40"]},
+          "notifications": {"S2": "initial"}
+        }
+      },
+      {
+        "ingest": {"authority": "district-a", "case": "RC-10", "revision": 1, "product": "合成谷物棒", "lots": ["L31"], "status": "published"},
+        "expect": {
+          "event": "opened",
+          "case": {"state": "executable", "effective_lots": ["L31"]},
+          "notifications": {}
+        }
+      }
+    ],
+    "final": {
+      "cases": 3,
+      "review_open": 0,
+      "notification_counts": {"S1": 1, "S2": 1}
+    }
   },
   {
-    "name": "name",
-    "situation": "situation",
-    "observable": "observable"
+    "name": "证据不足进入待核",
+    "situation": "district-a 的 RC-8 已立案后，来源出现一条缺案件编号的观察，以及一条同编号但产品名冲突的观察。S1 订阅 district-a 并持 L10。",
+    "observable": "缺身份或产品名冲突的观察进入待核，不自动合案也不改案；案件状态保持上一有效修订。",
+    "stores": [
+      {"id": "S1", "authorities": ["district-a"], "lots": ["L10"]}
+    ],
+    "steps": [
+      {
+        "ingest": {"authority": "district-a", "case": "RC-8", "revision": 1, "product": "合成谷物棒", "lots": ["L10"], "status": "published"},
+        "expect": {
+          "event": "opened",
+          "case": {"state": "executable", "effective_lots": ["L10"]},
+          "notifications": {"S1": "initial"}
+        }
+      },
+      {
+        "ingest": {"authority": "district-a", "product": "合成谷物棒", "lots": ["L10"], "status": "published"},
+        "expect": {"event": "pending_review", "review_reason": "missing_identity", "notifications": {}}
+      },
+      {
+        "ingest": {"authority": "district-a", "case": "RC-8", "revision": 2, "product": "合成麦片", "lots": ["L10"], "status": "corrected"},
+        "expect": {
+          "event": "pending_review",
+          "review_reason": "product_conflict",
+          "case": {"state": "executable", "effective_lots": ["L10"], "product": "合成谷物棒", "max_revision": 1},
+          "notifications": {}
+        }
+      }
+    ],
+    "final": {
+      "cases": 1,
+      "review_open": 2,
+      "notification_counts": {"S1": 1}
+    }
   }
 ]

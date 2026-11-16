@@ -18,8 +18,10 @@
 
 ## 领域样例
 
-- `name`：situation；业务侧关注observable。
-- `name`：situation；业务侧关注observable。
-- `name`：situation；业务侧关注observable。
+- 批次补齐与撤回的追补：`district-a` 的 `RC-8` 首版只有产品名（案件待补），随后补齐批次 `L10`/`L11`，再更正撤掉 `L11`；补发与更正只覆盖见过旧内容或当前受影响的门店，旧页重现不恢复已撤范围。
+- 同编号跨地区与同名产品不合案：`district-a` 与 `district-b` 的同编号、同产品名公告各自成案，通知圈互不相通。
+- 证据不足进入待核：缺身份字段、产品名冲突或同修订号内容不一致的观察不自动改案，人工确认后归并。
+
+上述情景的机器可执行版本见 `fixtures/business_cases.json`，由 `tests/test_cases.py` 逐条核对。
 
 另外提供 `/rate-limited`、`/unstable`、`/range`、`/range-ignored`、`/truncated`、`/observations/1`、`/observations/2`、`/observations/3`、`/observations/4`。响应内容和版本由场景文件逐项声明，便于核对实际收到的来源资料。
